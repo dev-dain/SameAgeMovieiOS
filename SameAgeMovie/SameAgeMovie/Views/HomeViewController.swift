@@ -10,8 +10,9 @@ import SwiftUI
 
 class HomeViewController: UITableViewController {
     var movieList = [Movie]()
+    var dataTasks = [URLSessionTask]()
     var curPage = 1
-    var openStartDt, openEndDt: Int?
+    var openStartDt: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +28,7 @@ class HomeViewController: UITableViewController {
         tableView.register(HeaderView.self, forHeaderFooterViewReuseIdentifier: "HeaderView")
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "MovieTableViewCell")
         tableView.rowHeight = 60.0
+        tableView.prefetchDataSource = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateMovie(_:)), name: NSNotification.Name(rawValue: "fetchMovie"), object: nil)
         
@@ -36,12 +38,13 @@ class HomeViewController: UITableViewController {
     }
     
     @objc func updateMovie(_ notification: NSNotification) {
-        let year = notification.object as? Int ?? 2022
-        fetchMovie(of: 1, year: year)
+        openStartDt = notification.object as? Int ?? 2022
+        guard let openStartDt = openStartDt else { return }
+        fetchMovie(of: 1, year: openStartDt)
     }
 }
 
-// DataSource
+// MARK: DataSource
 extension HomeViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return movieList.count
@@ -50,9 +53,15 @@ extension HomeViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         let movie = movieList[indexPath.row]
+        
         cell.textLabel?.text = movie.movieNm
         cell.textLabel?.font = .systemFont(ofSize: 18.0, weight: .semibold)
-        cell.detailTextLabel?.text = movie.directors[0].peopleNm ?? ""
+        if movie.directors.isEmpty {
+            cell.detailTextLabel?.text = "감독 없음"
+        } else {
+            cell.detailTextLabel?.text = movie.directors[0].peopleNm ?? ""
+        }
+        
         cell.accessoryType = .disclosureIndicator
         cell.selectionStyle = .none
         return cell
@@ -69,13 +78,34 @@ extension HomeViewController {
 
 }
 
+// MARK: Prefetch Data
+extension HomeViewController: UITableViewDataSourcePrefetching {
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        guard curPage != 1 else { return }
+        
+        if let openStartDt = openStartDt {
+            indexPaths.forEach {
+                if ($0.row + 1) / 20 + 1 == curPage {
+                    self.fetchMovie(of: curPage, year: openStartDt)
+                }
+            }
+        }
+    }
+}
+// MARK: fetch Movie function
 private extension HomeViewController {
     func fetchMovie(of page: Int, year: Int) {
         if page == 1 {
             self.movieList = []
+            curPage = 1
         }
         
-        guard let url = URL(string: "https://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json?key=\(Key.KEY)&curPage=\(page)&itemPerPage=20&openStartDt=\(year)&openEndDt=\(year)") else { return }
+        guard let url = URL(string: "https://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json?key=\(Key.KEY)&curPage=\(page)&itemPerPage=20&openStartDt=\(year)&openEndDt=\(year)"),
+              dataTasks.firstIndex(where: { task in
+                  task.originalRequest?.url == url
+              }) == nil
+        else { return }
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         
@@ -91,9 +121,6 @@ private extension HomeViewController {
             
             switch response.statusCode {
             case (200...299):
-                movies.movieListResult.movieList.forEach {
-                    print($0)
-                }
                 self.movieList += movies.movieListResult.movieList
                 self.curPage += 1
                 
@@ -118,10 +145,11 @@ private extension HomeViewController {
             }
         }
         dataTask.resume()
+        dataTasks.append(dataTask)
     }
 }
 
-// SwiftUI를 활용한 미리보기
+// MARK: SwiftUI를 활용한 미리보기
 struct HomeViewController_Preview: PreviewProvider {
     static var previews: some View {
         Container().edgesIgnoringSafeArea(.all)

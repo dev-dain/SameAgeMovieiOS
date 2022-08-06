@@ -113,7 +113,6 @@ class HeaderView: UITableViewHeaderFooterView {
     // MARK: Selector Method
     @objc func changeTextFieldValue(_ sender: UITextField) {
         guard let year = yearTextField.text else { return }
-        print(year)
         if year.isEmpty {
             submitButton.isEnabled = false
         } else if !submitButton.isEnabled {
