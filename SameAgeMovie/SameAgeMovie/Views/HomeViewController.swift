@@ -68,7 +68,7 @@ extension HomeViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 110.0
+        return 125.0
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -96,7 +96,8 @@ extension HomeViewController: UITableViewDataSourcePrefetching {
 private extension HomeViewController {
     func fetchMovie(of page: Int, year: Int) {
         if page == 1 {
-            self.movieList = []
+            movieList = []
+            dataTasks = []
             curPage = 1
         }
         

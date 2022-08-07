@@ -9,8 +9,6 @@ import UIKit
 import SnapKit
 
 class HeaderView: UITableViewHeaderFooterView {
-    var fetchMovie: ((Int, Int) -> Void)?
-    
     // MARK: Create UI Components
     private var welcomeLabel: UILabel = {
         let label = UILabel()
@@ -27,6 +25,7 @@ class HeaderView: UITableViewHeaderFooterView {
         textField.backgroundColor = .white
         textField.layer.cornerRadius = 5.0
         textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        textField.keyboardType = .numberPad
         textField.addPadding()
         textField.addTarget(self, action: #selector(changeTextFieldValue(_:)), for: [.editingChanged, .valueChanged])
         return textField
@@ -75,6 +74,8 @@ class HeaderView: UITableViewHeaderFooterView {
     // MARK: override function
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        contentView.addGestureRecognizer(tap)
         setupHeaderView()
         configureLayout()
     }
@@ -130,7 +131,12 @@ class HeaderView: UITableViewHeaderFooterView {
             cautionLabel.isHidden = false
             return
         }
+        yearTextField.resignFirstResponder()
         NotificationCenter.default.post(name: Notification.Name(rawValue: "fetchMovie"), object: year)
+    }
+    
+    @objc func dismissKeyboard() {
+        contentView.endEditing(true)
     }
 
     /*
