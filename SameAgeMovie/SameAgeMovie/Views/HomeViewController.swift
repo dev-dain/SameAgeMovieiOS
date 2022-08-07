@@ -63,8 +63,15 @@ extension HomeViewController {
         }
         
         cell.accessoryType = .disclosureIndicator
-        cell.selectionStyle = .none
+        cell.selectionStyle = .blue
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let movieNm = movieList[indexPath.row].movieNm
+        let detailViewController = MovieDetailViewController()
+        detailViewController.movieNm = movieNm
+        show(detailViewController, sender: self)
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
