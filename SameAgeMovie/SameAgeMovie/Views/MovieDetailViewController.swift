@@ -25,7 +25,7 @@ class MovieDetailViewController: UIViewController {
         if let movieNm = movieNm {
             navigationItem.title = movieNm
             navigationItem.largeTitleDisplayMode = .never
-            let urlString = "https://m.search.naver.com/search.naver?sm=mtp_hty.top&where=m&query=\(movieNm)"
+            let urlString = "https://m.search.naver.com/search.naver?sm=mtp_hty.top&where=m&query=영화 \(movieNm)"
             guard let encodedURL = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
             let url = URL(string: encodedURL)!
             let request = URLRequest(url: url)

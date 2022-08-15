@@ -21,7 +21,7 @@ class HeaderView: UITableViewHeaderFooterView {
     private var yearTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
-//        textField.placeholder = "1997"
+        textField.placeholder = "1997"
         textField.backgroundColor = .white
         textField.layer.cornerRadius = 5.0
         textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -35,7 +35,12 @@ class HeaderView: UITableViewHeaderFooterView {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("보기", for: .normal)
-        button.setTitleColor(.systemBlue, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 5
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.systemBlue.cgColor
+        button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
         button.setTitleColor(.lightGray, for: .disabled)
         button.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         button.isEnabled = false

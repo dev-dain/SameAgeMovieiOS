@@ -13,34 +13,33 @@ class HomeViewController: UITableViewController {
     var dataTasks = [URLSessionTask]()
     var curPage = 1
     var openStartDt: Int?
+    private let loadingView = UIView()
+    private let spinner = UIActivityIndicatorView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let indicatorView = UIActivityIndicatorView()
-        indicatorView.isHidden = true
-        
-        navigationItem.title = "동갑내기 영화🍿"
-        navigationItem.largeTitleDisplayMode = .always
-        navigationController?.navigationBar.prefersLargeTitles = true
-        
-        tableView = UITableView(frame: .zero, style: .grouped)
-        tableView.register(HeaderView.self, forHeaderFooterViewReuseIdentifier: "HeaderView")
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "MovieTableViewCell")
-        tableView.rowHeight = 60.0
-        tableView.prefetchDataSource = self
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(updateMovie(_:)), name: NSNotification.Name(rawValue: "fetchMovie"), object: nil)
-        
-//        if movieList.isEmpty {
-//            self.view = UIActivityIndicatorView()
-//        }
+        setHomeView()
     }
     
     @objc func updateMovie(_ notification: NSNotification) {
         openStartDt = notification.object as? Int ?? 2022
+        self.spinner.isHidden = false
+        self.spinner.startAnimating()
+        movieList = []
+        dataTasks = []
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+        
         guard let openStartDt = openStartDt else { return }
-        fetchMovie(of: 1, year: openStartDt)
+        fetchMovie(of: 1, year: openStartDt, completionHandler: { [weak self] result in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                // UIActivityIndicatorView.stopAnimating() must be used from main thread only
+                self.spinner.stopAnimating()
+                self.spinner.isHidden = true
+            }
+        })
     }
 }
 
@@ -93,7 +92,9 @@ extension HomeViewController: UITableViewDataSourcePrefetching {
         if let openStartDt = openStartDt {
             indexPaths.forEach {
                 if ($0.row + 1) / 20 + 1 == curPage {
-                    self.fetchMovie(of: curPage, year: openStartDt)
+                    self.fetchMovie(of: curPage, year: openStartDt, completionHandler: { [weak self] result in
+                        guard let self = self else { return }
+                    })
                 }
             }
         }
@@ -101,10 +102,29 @@ extension HomeViewController: UITableViewDataSourcePrefetching {
 }
 // MARK: fetch Movie function
 private extension HomeViewController {
-    func fetchMovie(of page: Int, year: Int) {
+    func setHomeView() {
+        navigationItem.title = "동갑내기 영화🍿"
+        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.backButtonTitle = "뒤로가기"
+        
+        tableView = UITableView(frame: .zero, style: .grouped)
+        tableView.register(HeaderView.self, forHeaderFooterViewReuseIdentifier: "HeaderView")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "MovieTableViewCell")
+        tableView.rowHeight = 60.0
+        tableView.prefetchDataSource = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateMovie(_:)), name: NSNotification.Name(rawValue: "fetchMovie"), object: nil)
+        
+        view.addSubview(spinner)
+        spinner.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+        }
+    }
+    
+    func fetchMovie(of page: Int, year: Int, completionHandler: @escaping (MovieListResult) -> Void) {
         if page == 1 {
-            movieList = []
-            dataTasks = []
             curPage = 1
         }
         
@@ -126,6 +146,7 @@ private extension HomeViewController {
                 print("ERROR URLSession data task \(error?.localizedDescription ?? "")")
                 return
             }
+            completionHandler(movies)
             
             switch response.statusCode {
             case (200...299):
