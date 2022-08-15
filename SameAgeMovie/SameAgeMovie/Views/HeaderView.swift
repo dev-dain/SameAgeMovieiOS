@@ -9,6 +9,8 @@ import UIKit
 import SnapKit
 
 class HeaderView: UITableViewHeaderFooterView {
+    private var yearList = Array(1919...2022)
+    
     // MARK: Create UI Components
     private var welcomeLabel: UILabel = {
         let label = UILabel()
@@ -18,10 +20,12 @@ class HeaderView: UITableViewHeaderFooterView {
         return label
     }()
     
+    private var yearPicker: UIPickerView = UIPickerView()
+    
     private var yearTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = "1997"
+        textField.placeholder = "탭해서 골라보세요"
         textField.backgroundColor = .white
         textField.layer.cornerRadius = 5.0
         textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -81,6 +85,12 @@ class HeaderView: UITableViewHeaderFooterView {
         super.init(reuseIdentifier: reuseIdentifier)
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         contentView.addGestureRecognizer(tap)
+    
+        yearPicker.delegate = self
+        yearPicker.dataSource = self
+        yearTextField.inputView = yearPicker
+        yearPicker.selectRow(78, inComponent: 0, animated: true)
+        
         setupHeaderView()
         configureLayout()
     }
@@ -129,6 +139,11 @@ class HeaderView: UITableViewHeaderFooterView {
         }
     }
     
+    @objc func selectYear() {
+        
+        contentView.endEditing(true)
+    }
+    
     @objc func tapSubmitButton(_ sender: UIButton) {
         guard let y = yearTextField.text else { return }
         guard let year = Int(y) else {
@@ -144,12 +159,24 @@ class HeaderView: UITableViewHeaderFooterView {
         contentView.endEditing(true)
     }
 
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
+}
+
+extension HeaderView: UIPickerViewDelegate, UIPickerViewDataSource {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
     }
-    */
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return String(yearList[row])
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return yearList.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        yearTextField.text = String(yearList[row])
+        submitButton.isEnabled = true
+    }
 
 }
