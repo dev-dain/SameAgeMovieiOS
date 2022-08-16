@@ -20,6 +20,7 @@
 		A50F2637289CEF93006EFED1 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = A50F2636289CEF93006EFED1 /* SnapKit */; };
 		A50F2639289CF5AA006EFED1 /* Key.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50F2638289CF5AA006EFED1 /* Key.swift */; };
 		A50F263B289D0BEF006EFED1 /* UITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50F263A289D0BEF006EFED1 /* UITextField.swift */; };
+		A529692128ABDF7900C74E10 /* FooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A529692028ABDF7900C74E10 /* FooterView.swift */; };
 		A53B9B92289F78BF00F893B0 /* MovieDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A53B9B91289F78BF00F893B0 /* MovieDetailViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +58,7 @@
 		A50F262F289CE6F6006EFED1 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		A50F2638289CF5AA006EFED1 /* Key.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Key.swift; sourceTree = "<group>"; };
 		A50F263A289D0BEF006EFED1 /* UITextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextField.swift; sourceTree = "<group>"; };
+		A529692028ABDF7900C74E10 /* FooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterView.swift; sourceTree = "<group>"; };
 		A53B9B91289F78BF00F893B0 /* MovieDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -144,6 +146,7 @@
 				A50F262B289CE62A006EFED1 /* HomeViewController.swift */,
 				A50F262F289CE6F6006EFED1 /* HeaderView.swift */,
 				A53B9B91289F78BF00F893B0 /* MovieDetailViewController.swift */,
+				A529692028ABDF7900C74E10 /* FooterView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 				A50F2639289CF5AA006EFED1 /* Key.swift in Sources */,
 				A50F2630289CE6F6006EFED1 /* HeaderView.swift in Sources */,
 				A50F263B289D0BEF006EFED1 /* UITextField.swift in Sources */,
+				A529692128ABDF7900C74E10 /* FooterView.swift in Sources */,
 				A50F25FC289CE5D4006EFED1 /* AppDelegate.swift in Sources */,
 				A53B9B92289F78BF00F893B0 /* MovieDetailViewController.swift in Sources */,
 				A50F25FE289CE5D4006EFED1 /* SceneDelegate.swift in Sources */,

@@ -26,7 +26,7 @@ class HeaderView: UITableViewHeaderFooterView {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "탭해서 골라보세요"
-        textField.backgroundColor = .white
+        textField.backgroundColor = .systemBackground
         textField.layer.cornerRadius = 5.0
         textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
         textField.keyboardType = .numberPad

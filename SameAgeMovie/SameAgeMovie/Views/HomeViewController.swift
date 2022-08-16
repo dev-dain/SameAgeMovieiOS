@@ -81,6 +81,15 @@ extension HomeViewController {
         guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "HeaderView") as? HeaderView else { return UIView() }
         return headerView
     }
+    
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return movieList.isEmpty ? 0 : 60.0
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        guard let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "FooterView") as? FooterView else { return UIView() }
+        return footerView
+    }
 
 }
 
@@ -106,11 +115,12 @@ private extension HomeViewController {
         navigationItem.title = "동갑내기 영화🍿"
         navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.backButtonTitle = "뒤로가기"
+        navigationItem.backButtonTitle = ""
         
         tableView = UITableView(frame: .zero, style: .grouped)
         tableView.register(HeaderView.self, forHeaderFooterViewReuseIdentifier: "HeaderView")
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "MovieTableViewCell")
+        tableView.register(FooterView.self, forHeaderFooterViewReuseIdentifier: "FooterView")
         tableView.rowHeight = 60.0
         tableView.prefetchDataSource = self
         
