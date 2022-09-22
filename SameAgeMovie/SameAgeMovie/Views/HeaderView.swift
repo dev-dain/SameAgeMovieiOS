@@ -7,6 +7,8 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 class HeaderView: UITableViewHeaderFooterView {
     private var yearList = Array(1919...2022)
@@ -31,11 +33,10 @@ class HeaderView: UITableViewHeaderFooterView {
         textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
         textField.keyboardType = .numberPad
         textField.addPadding()
-        textField.addTarget(self, action: #selector(changeTextFieldValue(_:)), for: [.editingChanged, .valueChanged])
         return textField
     }()
     
-    private var submitButton: UIButton = {
+    private lazy var submitButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("보기", for: .normal)
@@ -93,11 +94,45 @@ class HeaderView: UITableViewHeaderFooterView {
         
         setupHeaderView()
         configureLayout()
+        
+        bindYearFieldInput()
+        bindSubmitButtonOutput()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    
+    
+    
+    // MARK: Rx Property
+    var disposeBag = DisposeBag()
+    let yearInput: BehaviorSubject<Int> = BehaviorSubject(value: 1997)
+    let yearValid: BehaviorSubject<Bool> = BehaviorSubject(value: false)
+
+    
+    // MARK: Rx
+    private func bindYearFieldInput() {
+        yearTextField.rx.text.orEmpty
+            .compactMap({ Int($0) })
+            .bind(to: yearInput)
+            .disposed(by: disposeBag)
+        yearTextField.rx.text.orEmpty
+            .map({ Int($0) ?? 0 })
+            .map({ self.yearList.contains($0) })
+            .bind(to: yearValid)
+            .disposed(by: disposeBag)
+    }
+    
+    private func bindSubmitButtonOutput() {
+        yearInput.subscribe(onNext: { i in print(i) })
+        yearValid.subscribe(onNext: { b in
+            self.submitButton.isEnabled = b
+            self.cautionLabel.isHidden = b
+        })
+    }
+    
     
     // MARK: setup function
     private func setupHeaderView() {
@@ -127,20 +162,7 @@ class HeaderView: UITableViewHeaderFooterView {
     }
     
     // MARK: Selector Method
-    @objc func changeTextFieldValue(_ sender: UITextField) {
-        guard let year = yearTextField.text else { return }
-        if year.isEmpty {
-            submitButton.isEnabled = false
-        } else if !submitButton.isEnabled {
-            submitButton.isEnabled = true
-            if !cautionLabel.isHidden {
-                cautionLabel.isHidden = true
-            }
-        }
-    }
-    
     @objc func selectYear() {
-        
         contentView.endEditing(true)
     }
     
